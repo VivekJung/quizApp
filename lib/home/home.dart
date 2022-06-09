@@ -1,22 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:quizapp/shared/widgets/custom_buttom_nav.dart';
+import 'package:quizapp/login/login.dart';
+import 'package:quizapp/services/auth_service.dart';
+import 'package:quizapp/shared/common_widgets/custom_loading_indicator.dart';
+import 'package:quizapp/shared/common_widgets/error_notifier.dart';
+import 'package:quizapp/topics/topics.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: CustomBottomNavBar(),
-      body: Center(
-        child: ElevatedButton(
-          child: Text(
-            'about',
-            style: Theme.of(context).textTheme.button,
-          ),
-          onPressed: () => Navigator.pushNamed(context, '/about'),
-        ),
-      ),
+    return StreamBuilder(
+      stream: AuthService().userStream,
+      builder: (conext, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return circularLoading();
+        } else if (snapshot.hasError) {
+          return errorNotification();
+        } else if (snapshot.hasData) {
+          return const TopicsScreen();
+        } else {
+          return const LoginScreen();
+        }
+      },
     );
   }
 }
